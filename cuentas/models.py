@@ -7,9 +7,10 @@ from django.contrib.auth.models import User
 class Account(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=250)
-    user = models.ForeignKey(User, models.DO_NOTHING, related_name='accounts')
+    user = models.ForeignKey(User, models.DO_NOTHING, related_name='accounts',null=True)
     balance = models.FloatField(default=0)
     type_account = models.CharField(max_length=20, choices=[("normal","Normal"),("debt","Debt")],default="normal")
+    order = models.IntegerField(default=0)
     created = models.DateTimeField(default=now_for_default)
     
 

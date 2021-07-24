@@ -1,19 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hola soy el home</title>
-</head>
-<body>
-    
-    {% if user.is_authenticated %}
-        Hi {{ user.username }}!
-        <p><a href="{% url 'logout' %}">logout</a></p>
-        {% else %}
-        <p>You are not logged in</p>
-        <a href="{% url 'login' %}">login</a>
-    {% endif %}
-</body>
-</html>
+{% extends 'cuentas/base.html' %}
+
+{% block title %}Resumen{% endblock %}
+
+{% block content %}
+{% verbatim %}
+<div class="container mt-6" id="app">
+    <div class="columns">
+        <div class="column">
+            <div class="panel is-primary">
+                <p class="panel-heading">Cuentas</p>
+                <div class="panel-block">
+                    <p class="control">
+                        <input class="input is-primary" type="text" placeholder="Search">
+                        
+                    </p>
+                </div>
+                <a v-for="account in accounts" class="panel-block"
+                    v-bind:key="account.pk" v-bind:class="{'is-active': account.pk === account_active}">
+                    <span class="panel-icon"><span class="material-icons">account_balance_wallet</span></span>
+                    <strong>{{account.fields.name}}</strong> &nbsp; ${{account.fields.balance}}
+                    
+                </a>
+                {% endverbatim %}
+                <a class="panel-block" href="{% url 'create_account' %}">Agregar nueva cuenta</a>
+                {% verbatim %}
+            </div>
+        </div>
+        <div class="column">
+            formulario de gastos
+        </div>
+    </div>
+
+</div>
+{% endverbatim %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const accounts = {{accounts|safe}} ;
+    const account_active = {{active_account}} ;
+
+    const app = new Vue({
+        el: "#app",
+        data:function(){
+            return {
+                accounts:accounts,
+                account_active : account_active
+            }
+        },
+        methods:{
+            unclick:function(){
+                console.log("un click aaqui")
+            }
+        }
+    })
+</script>
+{% endblock %}

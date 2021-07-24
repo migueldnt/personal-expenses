@@ -1,0 +1,17 @@
+{% extends 'cuentas/base.html' %}
+
+{% block title %}Crear nueva cuenta{% endblock %}
+
+{% block content %}
+<div class="container is-max-desktop mt-6">
+    <h1 class="title is-4">Crear nueva cuenta</h1>
+    <p>{{status}}</p>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Guardar</button>
+    </form>
+    
+</div>
+{% endblock %}
