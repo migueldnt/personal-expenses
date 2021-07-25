@@ -7,9 +7,9 @@ from .models import Account
 
 def homeCapture(request):
     if request.user.is_authenticated:
-        accounts = Account.objects.filter(user=request.user)
+        accounts = Account.objects.filter(user=request.user,status="visible").order_by("order")
         accounts_json = serializers.serialize("json",accounts)
-        active_account = request.GET["account-active"]
+        active_account = request.GET["account-active"] if "account-active" in request.GET else 0 
         return render(request=request,template_name="cuentas/home.html",
             context={"accounts":accounts_json,"active_account":active_account}
             )
@@ -24,6 +24,8 @@ def createAccount(request):
         if form.is_valid():
             account=form.save()
             account.user = request.user
+            next_order = Account.objects.filter(user=request.user).count()
+            account.order = next_order
             account.save()
             return HttpResponseRedirect("/?account-active="+str(account.id))
         else:

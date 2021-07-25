@@ -9,25 +9,43 @@
         <div class="column">
             <div class="panel is-primary">
                 <p class="panel-heading">Cuentas</p>
+                <!--
                 <div class="panel-block">
                     <p class="control">
                         <input class="input is-primary" type="text" placeholder="Search">
                         
                     </p>
                 </div>
-                <a v-for="account in accounts" class="panel-block"
-                    v-bind:key="account.pk" v-bind:class="{'is-active': account.pk === account_active}">
+                -->
+                <a v-for="account in majorOrderedAccounts" class="panel-block"
+                    v-bind:key="account.pk" v-bind:class="{'is-active': account.pk === account_active}"
+                    @click="set_active_account(account.pk)"
+                >
                     <span class="panel-icon"><span class="material-icons">account_balance_wallet</span></span>
-                    <strong>{{account.fields.name}}</strong> &nbsp; ${{account.fields.balance}}
+                    {{account.fields.name}} &nbsp; <span class="transaction-value">${{account.fields.balance}}</span>
                     
                 </a>
                 {% endverbatim %}
-                <a class="panel-block" href="{% url 'create_account' %}">Agregar nueva cuenta</a>
+                <a class="panel-block" href="{% url 'create_account' %}">
+                    <span class="panel-icon"> <span class="material-icons">add</span> </span>
+                    Agregar nueva cuenta
+                </a>
                 {% verbatim %}
             </div>
         </div>
-        <div class="column">
-            formulario de gastos
+        <div class="column" v-if="accounts.length>0">
+            <form-transaction type-transaction="subtract" 
+                :account="account_selected.pk" :account-name="account_selected.fields.name"
+                :available-accounts="cuentas_lista"
+            />
+        </div>
+        <div class="column" v-if="accounts.length>0">
+            <form-transaction type-transaction="add" 
+                :account="account_selected.pk"
+                :account-name="account_selected.fields.name"
+                :available-accounts="cuentas_lista"
+            />
+
         </div>
     </div>
 
@@ -36,23 +54,71 @@
 {% endblock %}
 
 {% block scripts %}
+{% load static %} 
+<script src="{% static 'cuentas/'%}form_transaction.js"></script>
 <script>
     const accounts = {{accounts|safe}} ;
     const account_active = {{active_account}} ;
+
 
     const app = new Vue({
         el: "#app",
         data:function(){
             return {
                 accounts:accounts,
-                account_active : account_active
+                account_active : account_active,
+                cuentas_lista:[]
             }
         },
         methods:{
-            unclick:function(){
-                console.log("un click aaqui")
+            set_active_account:function(account_id){
+                this.account_active = account_id
+                //console.log(window.location.search)
+                window.history.replaceState({},"",`?account-active=${this.account_active}`)
+                //window.location.search=`?account-active=${this.account_active}`
             }
+        },
+        computed:{
+            majorOrderedAccounts:function(){
+                //siempre regresar la cuanta activa en primer lugar, independientemente del orden
+                if(this.account_active==0){
+                    return this.accounts
+                } 
+                let account_active_index = this.accounts.findIndex(account=>account.pk==this.account_active)
+                let new_order = [...this.accounts]
+                new_order.splice(account_active_index,1)
+                new_order.unshift({...this.accounts[account_active_index]})
+                
+                return new_order
+            },
+            account_selected:function(){
+                return this.account_active!=0 
+                    ? this.accounts.find(account=>account.pk==this.account_active)
+                    : {pk:0,fields:{name:"undefined"}}
+            }
+        },
+        mounted:function(){
+            if(this.account_active===0 && this.accounts.length>0){
+                this.account_active=this.accounts[0].pk
+            }
+            this.cuentas_lista = [...this.accounts].map(item=>{return { "id":item.pk, "name":item.fields.name }})
         }
     })
 </script>
+{% endblock %}
+
+{% block header %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@700&display=swap" rel="stylesheet">
+<style>
+    .panel-block.is-active{
+        font-size: 1.3rem;
+    }
+    .transaction-value{
+        font-family: 'Source Code Pro', monospace;
+        font-weight: 700;
+    }
+</style>
+
 {% endblock %}

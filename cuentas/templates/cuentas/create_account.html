@@ -5,13 +5,21 @@
 {% block content %}
 <div class="container is-max-desktop mt-6">
     <h1 class="title is-4">Crear nueva cuenta</h1>
-    <p>{{status}}</p>
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-
-        <button type="submit">Guardar</button>
+        <br>
+        <a class="button is-info" href="/">Regresar</a>
+        <button class="button is-primary" type="submit">Guardar</button>
     </form>
     
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll("input[type='text'],select").forEach(element=>{
+            element.classList.add("input")
+    })
+</script>
 {% endblock %}

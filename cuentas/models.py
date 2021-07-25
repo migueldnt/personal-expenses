@@ -11,14 +11,18 @@ class Account(models.Model):
     balance = models.FloatField(default=0)
     type_account = models.CharField(max_length=20, choices=[("normal","Normal"),("debt","Debt")],default="normal")
     order = models.IntegerField(default=0)
+    status = models.CharField(max_length=20, choices=[("visible","Visible"),("hidden","Hidden")], default="visible") 
     created = models.DateTimeField(default=now_for_default)
     
 
 class Transaction(models.Model):
     id = models.BigAutoField(primary_key=True)
     amount = models.FloatField(default=0)
+    concept = models.CharField(max_length=250,default="")
     account = models.ForeignKey(Account, models.DO_NOTHING,related_name="transactions")
     occurred_in = models.DateTimeField(default=now_for_default)
     created = models.DateTimeField(default=now_for_default)
+    affected_account_id = models.BigIntegerField(default=0)
+    related_transaction_id = models.BigIntegerField(default=0)
     type_transaction = models.CharField(max_length=20, choices=[("add","Add"),("subtract","Subtract")])
 
