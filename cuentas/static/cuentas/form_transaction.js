@@ -4,7 +4,7 @@ Vue.component("form-transaction", {
         <div class="field">
         <label class="label">{{typeTransaction==="add"? "Abono" : "Cargo"}} a {{accountName}}</label>
             <div class="control has-icons-left">
-                <input type="number" class="input transaction-value" placeholder="Monto" >
+                <input type="number" class="input transaction-value" placeholder="Monto" v-model="amount" >
                 <span class="icon is-left">
                     <span class="material-icons">attach_money</span>
                 </span>
@@ -12,7 +12,7 @@ Vue.component("form-transaction", {
         </div>
         <div class="field">
             <div class="control">
-                <input type="text" class="input"  placeholder="Concepto">
+                <input type="text" class="input"  placeholder="Concepto" v-model="concept">
             </div>
         </div>
         
@@ -21,7 +21,7 @@ Vue.component("form-transaction", {
                 <label class="label">Cuenta a {{typeTransaction==="add"? "cargar" : "abonar"}}</label>
                 <div class="control">
                     <div class="select">
-                        <select>
+                        <select v-model="affected_account_id">
                             <option value="0">--Ninguna--</option>
                             <option v-for="cuenta in list_other_accounts" :key="cuenta.id" :value="cuenta.id">
                                 {{cuenta.name}}
@@ -50,11 +50,11 @@ Vue.component("form-transaction", {
                 </span>
                 <span>{{form_expanded? "Menos" : "Mas"}}</span>
             </button>
-            <button class="button is-primary" >
+            <button class="button is-primary" @click="save">
                 <span class="icon">
                     <span class="material-icons">{{typeTransaction==="add" ? "login" : "logout"}}</span>
                 </span>
-                <span><strong>{{typeTransaction==="add"? "Abono" : "Cargo"}} a {{accountName.length>15 ? accountName.substring(0,15)+"..." : accountName }}</strong></span>
+                <span><strong>{{typeTransaction==="add"? "Abono" : "Cargo"}} a {{accountName?.length>15 ? accountName.substring(0,15)+"..." : accountName }}</strong></span>
             </button>
         </div>
     </div>
@@ -82,7 +82,7 @@ Vue.component("form-transaction", {
     },
     data:function(){
         return {
-            amount:0,
+            amount:"",
             concept:"",
             date:"",
             time:"",
@@ -104,11 +104,45 @@ Vue.component("form-transaction", {
         expandirForm:function(){
             this.form_expanded=!this.form_expanded
             this.dateTimeToNow()
+        },
+        save:function(){
+            if(!this.form_expanded){
+                this.dateTimeToNow()
+            }
+            let formdata= {
+                "type_transaction": this.typeTransaction,
+                "amount":Math.abs(this.amount),
+                "concept": this.concept,
+                "account": this.account,
+                "occurred_in": this.date+"T"+this.time,
+                "affected_account_id" : this.affected_account_id,
+                //"csrfmiddlewaretoken" : this.csrf
+            }
+            const data1=  new URLSearchParams(formdata).toString();
+            console.log(data1)
+            let url="/rest/create-transaction/"
+            fetch(url,{
+                method:"POST",
+                body: data1,//JSON.stringify(formdata),
+                
+                headers:{
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+
+            }).then(response=>response.json()).then(data=>{
+                console.log(data)
+            })
         }
     },
     computed:{
         list_other_accounts:function(){
             return this.availableAccounts.filter(item=>item.id!=this.account)
+        }
+    },
+    watch:{
+        "account":function(){
+            this.affected_account_id = 0;
         }
     }
 })
@@ -131,4 +165,10 @@ const formatTime = (date)=>{
 
 function pad2(n) {
     return (n < 10 ? '0' : '') + n;
+}
+
+function getCookie(name) {
+    var value = '; ' + document.cookie,
+        parts = value.split('; ' + name + '=');
+    if (parts.length == 2) return parts.pop().split(';').shift();
 }
