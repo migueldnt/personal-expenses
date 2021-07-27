@@ -4,7 +4,7 @@ Vue.component("form-transaction", {
         <div class="field">
         <label class="label">{{typeTransaction==="add"? "Abono" : "Cargo"}} a {{accountName}}</label>
             <div class="control has-icons-left">
-                <input type="number" class="input transaction-value" placeholder="Monto" v-model="amount" >
+                <input type="number" class="input transaction-value" placeholder="Monto" v-model="amount" step="0.01" >
                 <span class="icon is-left">
                     <span class="material-icons">attach_money</span>
                 </span>
@@ -50,7 +50,10 @@ Vue.component("form-transaction", {
                 </span>
                 <span>{{form_expanded? "Menos" : "Mas"}}</span>
             </button>
-            <button class="button is-primary" @click="save">
+            <button class="button is-primary" @click="save" 
+                :class="{'is-loading':enviando_info}" 
+                :disabled="!is_valid_form || enviando_info "
+            >
                 <span class="icon">
                     <span class="material-icons">{{typeTransaction==="add" ? "login" : "logout"}}</span>
                 </span>
@@ -89,7 +92,8 @@ Vue.component("form-transaction", {
             affected_account_id:0,
             type_transaction: "add",
 
-            form_expanded:false
+            form_expanded:false,
+            enviando_info:false,
         }
     },
     mounted:function(){
@@ -104,6 +108,7 @@ Vue.component("form-transaction", {
         expandirForm:function(){
             this.form_expanded=!this.form_expanded
             this.dateTimeToNow()
+            this.affected_account_id = 0
         },
         save:function(){
             if(!this.form_expanded){
@@ -120,6 +125,7 @@ Vue.component("form-transaction", {
             }
             const data1=  new URLSearchParams(formdata).toString();
             console.log(data1)
+            this.enviando_info=true
             let url="/rest/create-transaction/"
             fetch(url,{
                 method:"POST",
@@ -131,13 +137,27 @@ Vue.component("form-transaction", {
                 }
 
             }).then(response=>response.json()).then(data=>{
-                console.log(data)
+                this.enviando_info = false
+                if(data.status){
+                    this.$emit("saved_successfully",data)
+                    this.amount = "";
+                    this.concept = "";
+                }
+            },error=>{
+                alert("algo fallo, vuelve a intentarlo")
             })
         }
+
     },
     computed:{
         list_other_accounts:function(){
             return this.availableAccounts.filter(item=>item.id!=this.account)
+        },
+        is_valid_form:function(){
+            const amount_valid = /^[0-9]+(\.)?[0-9]*$/.test(this.amount)
+            const concept_valid = this.concept.length>2
+
+            return amount_valid && concept_valid
         }
     },
     watch:{

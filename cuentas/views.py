@@ -61,12 +61,18 @@ def createTransaction(request) :
 
         if  es_cuenta_propia:
             transaction = formTransaction.save()
+            
             id_saved_transaction = transaction.pk
             account_primer_target = transaction.account
             amount_primer_target = transaction.amount
             tipo_primer_target = transaction.type_transaction
-            
+
+            transaction.amount = abs(transaction.amount) if tipo_primer_target == "add" else -abs(transaction.amount)
+            transaction.save()
+
             #checar si la transaccion es relaccionada y modifica a otra cuenta
+            modifico_2_cuentas = False
+            dict_2da_cuenta = {}
             if transaction.affected_account_id!=0 and Account.objects.filter(pk=transaction.affected_account_id).exists():
                 print(transaction.account, "se va a guardar en dos cuentas!!")
                 tipo = "add" if  transaction.type_transaction =="subtract" else "subtract"
@@ -80,8 +86,18 @@ def createTransaction(request) :
                 transaction.affected_account_id = account_primer_target.pk
                 transaction.save()
 
-                account_2target.balance = account_2target.balance + abs(transaction.amount) if tipo_primer_target == "add" else  account_2target.balance - abs(transaction.amount)
+                id_transaction2 = transaction.pk
+                transaction_target1 = Transaction.objects.get(pk=id_saved_transaction)
+                transaction_target1.related_transaction_id = id_transaction2
+                transaction_target1.save()
+
+                account_2target.balance = account_2target.balance + abs(transaction.amount) if tipo == "add" else  account_2target.balance - abs(transaction.amount)
                 account_2target.save()
+
+                modifico_2_cuentas = True
+                dict_2da_cuenta["id"] = id_transaction2
+                dict_2da_cuenta["account_balance"] = account_2target.balance
+                dict_2da_cuenta["account_id"] = account_2target.pk
 
 
 
@@ -89,7 +105,12 @@ def createTransaction(request) :
             account_primer_target.balance = account_primer_target.balance + abs(amount_primer_target) if tipo_primer_target == "add" else  account_primer_target.balance - abs(amount_primer_target)
             account_primer_target.save()
 
-            return JsonResponse({"status":True, "saved_id":id_saved_transaction,, })
+            response={"status":True, "saved_transaction":
+                {"id":id_saved_transaction, "account_balance":  account_primer_target.balance, "account_id":account_primer_target.pk } }
+            if modifico_2_cuentas:
+                response["related_transaction"]  = dict_2da_cuenta           
+
+            return JsonResponse(response)
         else:
             return HttpResponseForbidden()
 
