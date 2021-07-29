@@ -11,7 +11,7 @@
         <table class="table is-striped is-fullwidth">
             <thead>
                 <tr>
-                    <th>id</th>
+                    <th>#</th>
                     <th>Fecha</th>
                     <th>Concepto</th>
                     <th>Monto</th>
@@ -24,11 +24,11 @@
                 :class="{'has-background-success-light':trans.type_transaction=='add','has-background-danger-light':trans.type_transaction=='subtract'}"
                 >
                     <td>{{trans.pk}}</td>
-                    <td >{{trans.date}} {{trans.time}}</td>
+                    <td >{{trans.date}}<br> {{trans.time}}</td>
                     <td>{{trans.concept}}</td>
                     <th>{{trans.amount_parsed}}</th>
                     <td>{{trans.saldo}}</td>
-                    <td>{{trans.obs}}</td>
+                    <td v-html="trans.obs"></td>
                 </tr>
             </tbody>
             
@@ -54,13 +54,16 @@
         },
         mounted:function(){
             let posterior_saldo = saldo_final;
+            console.log("AQUI CREAR UN SERIALIZADOR PARA QUE LO DATOS LLEGUEN LO MAS ENTENDIBLES")
             this.parsedTransactions = [...this.transactions].map(item=>{
                 let transaction = {...item.fields}
                 transaction.pk =item.pk
                 transaction.date = (new Date(transaction.occurred_in)).toLocaleDateString("es-MX")
                 transaction.time = (new Date(transaction.occurred_in)).toLocaleTimeString()
                 transaction.amount_parsed = transaction.amount.toLocaleString('en-US',{style:'currency',currency: 'USD'})
-                transaction.obs = transaction.affected_account_id!=0 ? 'Relación con la cuenta   '+ transaction.affected_account_id : '..'
+                transaction.obs = transaction.affected_account_id!=0 
+                    ? 'Operación inversa cuenta <a href="/transactions/'+transaction.affected_account_id+'/">'+ transaction.affected_account_id +'</a> #'+transaction.related_transaction_id
+                    : '..'
                 transaction.saldo = (posterior_saldo).toLocaleString('en-US',{style:'currency',currency: 'USD'});
                 posterior_saldo = posterior_saldo - transaction.amount;
                 return transaction
