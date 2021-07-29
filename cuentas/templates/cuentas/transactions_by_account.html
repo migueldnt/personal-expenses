@@ -1,0 +1,71 @@
+{% extends 'cuentas/base.html' %}
+
+{% block title %}Transaccciones de {{account.name}}{% endblock %}
+
+{% block content %}
+<div class="container is-max-desktop mt-6" id="app">
+    <h1 class="title is-4">{{account.name}}, ${{account.balance}}</h1>
+    <h2 class="subtitle is-5">Transacciones</h2>
+    {% verbatim %}
+    <div class="table-container">
+        <table class="table is-striped is-fullwidth">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Fecha</th>
+                    <th>Concepto</th>
+                    <th>Monto</th>
+                    <th>Saldo Posterior</th>
+                    <th>Observaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="trans in parsedTransactions" :key="trans.pk" 
+                :class="{'has-background-success-light':trans.type_transaction=='add','has-background-danger-light':trans.type_transaction=='subtract'}"
+                >
+                    <td>{{trans.pk}}</td>
+                    <td >{{trans.date}} {{trans.time}}</td>
+                    <td>{{trans.concept}}</td>
+                    <th>{{trans.amount_parsed}}</th>
+                    <td>{{trans.saldo}}</td>
+                    <td>{{trans.obs}}</td>
+                </tr>
+            </tbody>
+            
+        </table>
+    </div>
+    {% endverbatim %}
+    <a class="button is-info" href="/?account-active={{account.pk}}">Regresar</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const transactions = {{transactions|safe}} ;
+    const saldo_final = {{account.balance}};
+
+    const app = new Vue({
+        el:"#app",
+        data:function(){
+            return {
+                transactions:transactions,
+                parsedTransactions:[]
+            }
+        },
+        mounted:function(){
+            let posterior_saldo = saldo_final;
+            this.parsedTransactions = [...this.transactions].map(item=>{
+                let transaction = {...item.fields}
+                transaction.pk =item.pk
+                transaction.date = (new Date(transaction.occurred_in)).toLocaleDateString("es-MX")
+                transaction.time = (new Date(transaction.occurred_in)).toLocaleTimeString()
+                transaction.amount_parsed = transaction.amount.toLocaleString('en-US',{style:'currency',currency: 'USD'})
+                transaction.obs = transaction.affected_account_id!=0 ? 'Relación con la cuenta   '+ transaction.affected_account_id : '..'
+                transaction.saldo = (posterior_saldo).toLocaleString('en-US',{style:'currency',currency: 'USD'});
+                posterior_saldo = posterior_saldo - transaction.amount;
+                return transaction
+            })
+        }
+    });
+</script>
+{% endblock %}

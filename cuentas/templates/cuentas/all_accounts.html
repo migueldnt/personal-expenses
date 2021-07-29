@@ -1,0 +1,48 @@
+{% extends 'cuentas/base.html' %}
+
+{% block title %}Todas las cuentas{% endblock %}
+
+{% block content %}
+<div class="container is-max-desktop mt-6">
+    <h1 class="title is-4">Todas las cuentas</h1>
+
+    <table class="table is-striped is-fullwidth">
+        <thead>
+            <tr>
+                <th>Orden</th>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Editar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cuenta in accounts %}
+                <tr>
+                    <td>{{cuenta.order}}</td>
+                    <td>{{cuenta.name}}</td>
+                    <td>{{cuenta.type_account}}</td>
+                    <td>{{cuenta.balance}}</td>
+                    <td>{{cuenta.status}}</td>
+                    <td>
+                        <a href="/edit-account/{{cuenta.pk}}/">
+                            <span class="material-icons">
+                                edit
+                            </span>
+                        </a>
+                        
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <a class="button is-info" href="/">Regresar</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+</script>
+{% endblock %}

@@ -13,7 +13,10 @@ class Account(models.Model):
     order = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=[("visible","Visible"),("hidden","Hidden")], default="visible") 
     created = models.DateTimeField(default=now_for_default)
+    comments = models.CharField(max_length=250,default="")
     
+    def __str__(self):
+        return str(self.user.username)+" ["+self.name + "] $" +str(self.balance)
 
 class Transaction(models.Model):
     id = models.BigAutoField(primary_key=True)

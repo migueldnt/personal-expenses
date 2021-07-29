@@ -6,11 +6,6 @@
 {% verbatim %}
 <div class="container mt-6" id="app">
     <div class="columns">
-        <div class="columns has-text-centered">
-            <a href="/auth/logout">Cerrar sesion</a>
-        </div>
-    </div>
-    <div class="columns">
         <div class="column">
             <div class="panel is-primary">
                 <p class="panel-heading">Cuentas</p>
@@ -35,7 +30,7 @@
                     <span class="panel-icon"> <span class="material-icons">add</span> </span>
                     Agregar nueva cuenta
                 </a>
-                
+                {% verbatim %}
             </div>
         </div>
         <div class="column" v-if="accounts.length>0">
@@ -57,9 +52,33 @@
         </div>
         
     </div>
+    <div class="columns">
+        <div class="column content">
+            
+            <p class="is-italic">
+                <strong class="has-text-weight-bold">{{account_selected?.fields?.name}} ${{account_selected?.fields?.balance}} </strong> 
+                {{account_selected?.fields?.comments}}<br>
+                Tipo: {{account_selected?.fields?.type_account}}.
+                Posicion: {{account_selected?.fields?.order}}. 
+                <a :href="`/edit-account/${account_selected.pk}/`">editar</a>
+            </p>
+            <p>
+                <a class="button is-primary" :href="`/transactions/${account_selected.pk}/`">Ver movimientos</a>
+            </p>
+        </div>
+        <div class="column">
+            <div class="buttons mt-6">
+                <a class="button is-small" href="/auth/logout">Cerrar sesion</a>
+                <a class="button is-small" href="#">Cambiar contraseña</a>
+                <a class="button is-small" href="/all-accounts">Todas mis cuentas</a>
+            </div>
+            
+
+        </div>
+    </div>
 
 </div>
-
+{% endverbatim %}
 {% endblock %}
 
 {% block scripts %}

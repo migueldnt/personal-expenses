@@ -1,11 +1,11 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404,get_list_or_404
 from django.http import HttpResponseRedirect,  HttpResponseForbidden, JsonResponse
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 
 
-from .forms import AccountForm,TransactionForm
+from .forms import AccountForm,TransactionForm,EditAccountForm
 from .models import Account,Transaction
 
 from django.contrib.auth.decorators import login_required
@@ -32,15 +32,41 @@ def createAccount(request):
         if form.is_valid():
             account=form.save()
             account.user = request.user
-            next_order = Account.objects.filter(user=request.user).count()
+            next_order = Account.objects.filter(user=request.user).count() + 1
             account.order = next_order
             account.save()
             return HttpResponseRedirect("/?account-active="+str(account.id))
         else:
-           return render(request=request,template_name="cuentas/create_account.html",context={"form":form, "status":"failed"}) 
+           return render(request=request,template_name="cuentas/form_account.html",context={"form":form, "title":"Error al guardar, vuelve a intentarlo"}) 
     
     form = AccountForm()
-    return render(request=request,template_name="cuentas/create_account.html",context={"form":form,"status":"ok"})
+    return render(request=request,template_name="cuentas/form_account.html",context={"form":form,"title":"Crear nueva cuenta"})
+
+@login_required
+def editAccount(request,account_id):
+    account_to_edit = get_object_or_404(Account,pk=account_id,user=request.user)
+    #print(account_to_edit)
+    if request.method == 'POST':
+        form = EditAccountForm(request.POST,instance=account_to_edit)
+        
+        #print(form.is_valid(), request.user.id,"is valid")
+        if form.is_valid():
+            account=form.save()
+            #account.user = request.user
+            #next_order = Account.objects.filter(user=request.user).count() + 1
+            #account.order = next_order
+            #account.save()
+            return HttpResponseRedirect("/?account-active="+str(account.id))
+        else:
+           return render(request=request,template_name="cuentas/form_account.html",context={"form":form, "title":"Error al guardar, vuelve a intentarlo"}) 
+    
+    form = EditAccountForm(instance=account_to_edit)
+    return render(request=request,template_name="cuentas/form_account.html",context={"form":form,"title":"Modificando cuenta"})
+
+@login_required
+def allAccounts(request):
+    accounts = Account.objects.filter(user=request.user).order_by("order")
+    return render(request=request,template_name="cuentas/all_accounts.html",context={"accounts":accounts})
 
 @login_required
 def createTransaction(request) :
@@ -119,3 +145,13 @@ def createTransaction(request) :
         #return JsonResponse({"status":True, "ddd1":"dddd"})
 
         return HttpResponseForbidden()
+
+
+@login_required
+def transactionsByAccount(request,account_id):
+    account_obj = get_object_or_404(Account,pk=account_id,user=request.user)
+    queryset_trans = Transaction.objects.filter(account=account_obj).order_by("-occurred_in")
+    transactions = get_list_or_404(queryset_trans)
+    transactions_json = serializers.serialize("json",transactions)
+    return render(request=request,template_name="cuentas/transactions_by_account.html",
+        context={"transactions":transactions_json,"account":account_obj})
