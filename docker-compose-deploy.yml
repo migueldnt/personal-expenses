@@ -15,13 +15,14 @@ services:
         build: 
             context: ./nginx
             dockerfile: Dockerfile
-        expose: 
-            - "80"
+        ports:
+            - 3000:3000
         depends_on:
             - django
         network_mode: host
         environment: 
             - VIRTUAL_HOST=personal-expenses.migueldnt.dev
+            - VIRTUAL_PORT=3000
             - LETSENCRYPT_HOST=personal-expenses.migueldnt.dev
             - LETSENCRYPT_EMAIL=miguel.danto@gmail.com
                
