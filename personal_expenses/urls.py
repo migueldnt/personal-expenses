@@ -17,8 +17,15 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path,include
 
+import django.views.static
+from django.conf import settings
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("auth/",include("login.urls")),
     path("", include("cuentas.urls")),
 ]
+
+estaticos= [url(r'^static/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.STATIC_ROOT, 'show_indexes': settings.DEBUG})]
+
+urlpatterns += estaticos
