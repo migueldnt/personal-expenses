@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+    django:
+        build: .
+        command: gunicorn personal_expenses.wsgi:application --bind 0.0.0.0:8000
+        container_name: "djangosystem"        
+        expose:
+            - 8000
+        env_file: 
+            - ".env"
+        network_mode: host
+        
+    nginx:
+        build: 
+            context: ./nginx
+            dockerfile: Dockerfile
+        expose: 
+            - "80"
+        depends_on:
+            - django
+        network_mode: host
+        environment: 
+            - VIRTUAL_HOST=personal-expenses.migueldnt.dev
+            - LETSENCRYPT_HOST=personal-expenses.migueldnt.dev
+            - LETSENCRYPT_EMAIL=miguel.danto@gmail.com
+               
+        
+
