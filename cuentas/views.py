@@ -149,8 +149,10 @@ def createTransaction(request) :
 
 @login_required
 def transactionsByAccount(request,account_id):
+    limit = request.GET["limit"] if "limit" in request.GET.dict() else 100
+    limit = int(limit)
     account_obj = get_object_or_404(Account,pk=account_id,user=request.user)
-    queryset_trans = Transaction.objects.filter(account=account_obj).order_by("-occurred_in")
+    queryset_trans = Transaction.objects.filter(account=account_obj).order_by("-occurred_in")[:limit]
     transactions = get_list_or_404(queryset_trans)
     transactions_json = serializers.serialize("json",transactions)
     return render(request=request,template_name="cuentas/transactions_by_account.html",

@@ -4,9 +4,17 @@
 
 {% block content %}
 <div class="container is-max-desktop mt-6" id="app">
-    <h1 class="title is-4">{{account.name}}, ${{account.balance}}</h1>
+    {% load humanize %}
+    <h1 class="title is-4">{{account.name}} ${{account.balance|intcomma}}</h1>
     <h2 class="subtitle is-5">Transacciones</h2>
     {% verbatim %}
+    
+    <div class="field">
+        <div class="control">
+          <input class="input" type="text" placeholder="Buscar" v-model="buscador">
+        </div>
+    </div>
+
     <div class="table-container">
         <table class="table is-striped is-fullwidth">
             <thead>
@@ -20,7 +28,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="trans in parsedTransactions" :key="trans.pk" 
+                <tr v-for="trans in transactions_filter" :key="trans.pk" 
                 :class="{'has-background-success-light':trans.type_transaction=='add','has-background-danger-light':trans.type_transaction=='subtract'}"
                 >
                     <td>{{trans.pk}}</td>
@@ -49,10 +57,18 @@
         data:function(){
             return {
                 transactions:transactions,
-                parsedTransactions:[]
+                parsedTransactions:[],
+                buscador:""
             }
         },
-        mounted:function(){
+        computed:{
+            transactions_filter:function(){
+                return this.parsedTransactions.filter(transaction=>{
+                    return transaction.concept.toLowerCase().includes(this.buscador.toLowerCase())
+                })
+            }
+        },
+        created:function(){
             let posterior_saldo = saldo_final;
             console.log("AQUI CREAR UN SERIALIZADOR PARA QUE LO DATOS LLEGUEN LO MAS ENTENDIBLES")
             this.parsedTransactions = [...this.transactions].map(item=>{

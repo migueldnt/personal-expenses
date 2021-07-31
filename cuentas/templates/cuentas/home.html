@@ -17,19 +17,23 @@
                     </p>
                 </div>
                 -->
-                <a v-for="account in majorOrderedAccounts" class="panel-block"
+                <div v-for="account in majorOrderedAccounts" class="panel-block renglon-cuenta"
                     v-bind:key="account.pk" v-bind:class="{'is-active': account.pk === account_active}"
                     @click="set_active_account(account.pk)"
                 >
                     <span class="panel-icon"><span class="material-icons">account_balance_wallet</span></span>
-                    {{account.fields.name}} &nbsp; <span class="transaction-value">${{account.fields.balance}}</span>
+                    <span>{{account.fields.name}}</span>&nbsp;
+                    <span class="transaction-value">{{account.fields.balance.toLocaleString('en-US',{style:'currency',currency: 'USD'})}}</span>
                     
-                </a>
+                </div>
                 {% endverbatim %}
-                <a class="panel-block" href="{% url 'create_account' %}">
-                    <span class="panel-icon"> <span class="material-icons">add</span> </span>
-                    Agregar nueva cuenta
-                </a>
+                <div class="panel-block" >
+                    <a href="{% url 'create_account' %}" class="button is-link is-outlined is-fullwidth">
+                        <span class="panel-icon"> <span class="material-icons">add</span> </span>
+                        Agregar nueva cuenta
+                    </a>
+                    
+                </div>
                 {% verbatim %}
             </div>
         </div>
@@ -56,7 +60,7 @@
         <div class="column content " v-if="accounts.length > 0">
             
             <p class="is-italic">
-                <strong class="has-text-weight-bold">{{account_selected?.fields?.name}} ${{account_selected?.fields?.balance}} </strong> 
+                <strong class="has-text-weight-bold">{{account_selected?.fields?.name}} {{account_selected?.fields?.balance?.toLocaleString('en-US',{style:'currency',currency: 'USD'})}} </strong> 
                 {{account_selected?.fields?.comments}}<br>
                 Tipo: {{account_selected?.fields?.type_account}}.
                 Posicion: {{account_selected?.fields?.order}}. 
@@ -162,11 +166,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@700&display=swap" rel="stylesheet">
 <style>
     .panel-block.is-active{
-        font-size: 1.3rem;
+        font-size: 1.25rem;
     }
     .transaction-value{
         font-family: 'Source Code Pro', monospace;
         font-weight: 700;
+    }
+    .renglon-cuenta{
+        cursor: pointer;
     }
 </style>
 

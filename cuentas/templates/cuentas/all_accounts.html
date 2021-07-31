@@ -5,20 +5,20 @@
 {% block content %}
 <div class="container is-max-desktop mt-6">
     <h1 class="title is-4">Todas las cuentas</h1>
-
-    <table class="table is-striped is-fullwidth">
-        <thead>
-            <tr>
-                <th>Orden</th>
-                <th>Nombre</th>
-                <th>Tipo</th>
-                <th>Balance</th>
-                <th>Status</th>
-                <th>Editar</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cuenta in accounts %}
+    <div class="table-container">
+        <table class="table is-striped is-fullwidth">
+            <thead>
+                <tr>
+                    <th>Orden</th>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th>Editar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cuenta in accounts %}
                 <tr>
                     <td>{{cuenta.order}}</td>
                     <td>{{cuenta.name}}</td>
@@ -31,13 +31,15 @@
                                 edit
                             </span>
                         </a>
-                        
+
                     </td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
     <a class="button is-info" href="/">Regresar</a>
 </div>
 {% endblock %}
