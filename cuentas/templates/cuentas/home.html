@@ -53,7 +53,7 @@
         
     </div>
     <div class="columns">
-        <div class="column content">
+        <div class="column content " v-if="accounts.length > 0">
             
             <p class="is-italic">
                 <strong class="has-text-weight-bold">{{account_selected?.fields?.name}} ${{account_selected?.fields?.balance}} </strong> 
@@ -66,10 +66,17 @@
                 <a class="button is-primary" :href="`/transactions/${account_selected.pk}/`">Ver movimientos</a>
             </p>
         </div>
+        {% endverbatim %}
         <div class="column">
-            <div class="buttons mt-6">
-                <a class="button is-small" href="/auth/logout">Cerrar sesion</a>
-                <a class="button is-small" href="#">Cambiar contraseña</a>
+            <p class="mt-2">
+                <span class="material-icons is-size-2">
+                account_circle
+                </span> {{user.get_username}}
+            </p>
+            <br>
+            <div class="buttons ">
+                <a class="button is-small" href="{% url 'logout' %}">Cerrar sesion</a>
+                <a class="button is-small" href="/auth/change-password/">Cambiar contraseña</a>
                 <a class="button is-small" href="/all-accounts">Todas mis cuentas</a>
             </div>
             
@@ -78,7 +85,7 @@
     </div>
 
 </div>
-{% endverbatim %}
+
 {% endblock %}
 
 {% block scripts %}

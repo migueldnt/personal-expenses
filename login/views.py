@@ -1,12 +1,20 @@
 from django.shortcuts import render,redirect
 
-from django.contrib.auth import logout
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate,login
 
-"""
-def login_view(request):
+def registroView(request):
+    if request.user.is_authenticated:
+        return redirect("/")
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user=form.save()
+            #user_auth=authenticate(user=user.username,password=user.password)
+            login(request,user)
+            return redirect("/?cuenta-nueva=true")
+        else:
+            return render(request=request,template_name="login/register-user.html",context={"form":form})
 
-
-def logout_view(request):
-    logout(request)
-    redirect("login_view",message="Vuelve pronto!")
-"""
+    form2 = UserCreationForm()
+    return render(request=request,template_name="login/register-user.html",context={"form":form2})

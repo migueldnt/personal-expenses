@@ -18,7 +18,7 @@ def homeCapture(request):
         accounts_json = serializers.serialize("json",accounts)
         active_account = request.GET["account-active"] if "account-active" in request.GET else 0 
         return render(request=request,template_name="cuentas/home.html",
-            context={"accounts":accounts_json,"active_account":active_account}
+            context={"accounts":accounts_json,"active_account":active_account,"user":request.user}
             )
     
     return redirect("login")
