@@ -3,10 +3,12 @@
 {% block title %}Transaccciones de {{account.name}}{% endblock %}
 
 {% block content %}
-<div class="container is-max-desktop mt-6" id="app">
+<div class="container is-max-desktop " id="app">
     {% load humanize %}
     <h1 class="title is-4">{{account.name}} ${{account.balance|intcomma}}</h1>
     <h2 class="subtitle is-5">Transacciones</h2>
+    <a class="button is-info" href="/?account-active={{account.pk}}">Regresar</a>
+    <hr>
     {% verbatim %}
     
     <div class="field">

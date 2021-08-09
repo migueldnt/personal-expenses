@@ -4,10 +4,22 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Saliste de la sesión</title>
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/cuentas/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/cuentas/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/cuentas/icons/favicon-16x16.png">
+    <link rel="manifest" href="/static/cuentas/icons/site.webmanifest">
+    <link rel="shortcut icon" href="/static/cuentas/icons/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="/static/cuentas/icons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
 </head>
 <body>
+    <section class="section">
     <div class="container is-max-desktop mt-6">
         <p class="has-text-centered">
             <strong>Saliste de tu sesión</strong>
@@ -15,7 +27,7 @@
             <a class="button is-primary" href="{% url 'login' %}">Volver a entrar</a>
         </p>
     </div>
-    
+    </section>
     
 </body>
 </html>
