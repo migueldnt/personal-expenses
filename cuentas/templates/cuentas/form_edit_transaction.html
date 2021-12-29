@@ -1,0 +1,30 @@
+{% extends 'cuentas/base.html' %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+<div class="container is-max-desktop ">
+    <h1 class="title is-4">{{title}}</h1>
+    <p><b>{% if form.instance.type_transaction == 'add'%}Abono{% else %}Cargo{% endif %}</b> en <b>{{form.instance.account.name}} [${{form.instance.account.balance}}]</b></p>
+    <br>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <br>
+        <a class="button is-info" href="/transactions/{{form.instance.account.pk}}/">Regresar</a>
+        <button class="button is-primary" type="submit">Guardar</button>
+    </form>
+    {% if afecta2 %}
+    <hr>
+    <div>Tambien se modificara un<b> {% if related_transaction.type_transaction == 'add'%}Abono{% else %}Cargo{% endif %}</b> relacionado  en  <b>{{related_transaction.account.name}} [${{related_transaction.account.balance}}]</b></div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll("input[type='text'],input[type='number'],select").forEach(element=>{
+            element.classList.add("input")
+    })
+</script>
+{% endblock %}

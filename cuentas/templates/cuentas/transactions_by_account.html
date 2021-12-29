@@ -27,6 +27,7 @@
                     <th>Monto</th>
                     <th>Saldo Posterior</th>
                     <th>Observaciones</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,6 +40,7 @@
                     <th>{{trans.amount_parsed}}</th>
                     <td>{{trans.saldo}}</td>
                     <td v-html="trans.obs"></td>
+                    <td><a :href="'/edit-transaction/'+trans.pk+'/'">editar</a> | <a :href="'/delete-transaction/'+trans.pk+'/'">borrar</a></td>
                 </tr>
             </tbody>
             
@@ -53,14 +55,19 @@
 <script>
     const transactions = {{transactions|safe}} ;
     const saldo_final = {{account.balance}};
-
+    const cuentas = {{all_accounts|safe}};
+    const cuentas_dict = cuentas.reduce((acum,current)=>{
+        acum[current.pk] =current.fields
+        return acum
+    },{})
     const app = new Vue({
         el:"#app",
         data:function(){
             return {
                 transactions:transactions,
                 parsedTransactions:[],
-                buscador:""
+                buscador:"",
+                diccionario_cuentas:cuentas_dict
             }
         },
         computed:{
@@ -79,8 +86,9 @@
                 transaction.date = (new Date(transaction.occurred_in)).toLocaleDateString("es-MX")
                 transaction.time = (new Date(transaction.occurred_in)).toLocaleTimeString()
                 transaction.amount_parsed = transaction.amount.toLocaleString('en-US',{style:'currency',currency: 'USD'})
+                const op_inversa= transaction.type_transaction==='add' ? 'Cargo': 'Abono'
                 transaction.obs = transaction.affected_account_id!=0 
-                    ? 'Operación inversa cuenta <a href="/transactions/'+transaction.affected_account_id+'/">'+ transaction.affected_account_id +'</a> #'+transaction.related_transaction_id
+                    ? op_inversa+' a <a href="/transactions/'+transaction.affected_account_id+'/">'+ this.diccionario_cuentas[ transaction.affected_account_id].name +'</a> transacción #'+transaction.related_transaction_id
                     : '..'
                 transaction.saldo = (posterior_saldo).toLocaleString('en-US',{style:'currency',currency: 'USD'});
                 posterior_saldo = posterior_saldo - transaction.amount;

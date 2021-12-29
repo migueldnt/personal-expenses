@@ -1,0 +1,45 @@
+{% extends 'cuentas/base.html' %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block content %}
+<div class="container is-max-desktop ">
+    <h1 class="title is-4">{{title}}</h1>
+    <p>Realmente deseas eliminar la transaccion de <b>{{transaction.account.name}} [${{transaction.account.balance}}]</b> con la siguiente información:</p>
+    <hr>
+    <p>
+        # {{transaction.pk}}<br>
+        {% if transaction.type_transaction == 'add'%}Abono{% else %}Cargo{% endif %}: <b>${{transaction.amount}}</b><br>
+        Concepto: <b>{{transaction.concept}}</b><br>
+        Ocurrida en: <b>{{transaction.occurred_in}}</b>
+    </p>
+    {% if afecta2cuentas %}
+    <hr>
+    <p>
+        Tambien se eliminara la operacion inversa en <b>{{related_transaction.account.name}} [${{related_transaction.account.balance}}]</b>:<br>
+        #{{related_transaction.pk}}<br>
+        {% if related_transaction.type_transaction == 'add'%}Abono{% else %}Cargo{% endif %}: <b>${{related_transaction.amount}}</b><br>
+        Concepto: <b>{{related_transaction.concept}}</b><br>
+        Ocurrida en: <b>{{related_transaction.occurred_in}}</b>
+    </p>
+    {% endif %}
+    <hr>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" value="true" name="confirmation">
+        <br>
+        <a class="button is-info" href="/transactions/{{transaction.account.pk}}/">Regresar</a>
+        <button class="button is-primary" type="submit">Borrar</button>
+    </form>
+    
+    <div>{{form.instance.affected_account_id}}</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll("input[type='text'],input[type='number'],select").forEach(element=>{
+            element.classList.add("input")
+    })
+</script>
+{% endblock %}

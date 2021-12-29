@@ -1,5 +1,6 @@
 from django import forms
 from django.db.models import fields
+from django.forms.models import ModelForm
 from .models import Account,Transaction
 from django.forms import TextInput,HiddenInput
 
@@ -23,3 +24,10 @@ class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ["id","amount","concept","account","occurred_in","affected_account_id","type_transaction"]
+
+class EditTransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ["amount","concept","occurred_in",]
+
+
