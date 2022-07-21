@@ -31,7 +31,7 @@ Vue.component("form-transaction", {
                 </div>
             </div>
             <div class="field">
-                <label class="label">Fecha y hora</label>
+                <label class="label">Fecha: {{date_label}}</label>
                 <div class="control">
                     <input type="date" class="input" v-model="date" >
                 </div>
@@ -158,6 +158,10 @@ Vue.component("form-transaction", {
             const concept_valid = this.concept.length>2
 
             return amount_valid && concept_valid
+        },
+        date_label:function(){
+            const options = {  weekday:'short',month:'long',day:'numeric',hour:'numeric',minute:'numeric'};
+            return new Intl.DateTimeFormat("es-MX",options).format(new Date(this.date+"T"+this.time))
         }
     },
     watch:{

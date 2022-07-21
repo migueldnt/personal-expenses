@@ -35,7 +35,7 @@
                 :class="{'has-background-success-light':trans.type_transaction=='add','has-background-danger-light':trans.type_transaction=='subtract'}"
                 >
                     <td>{{trans.pk}}</td>
-                    <td >{{trans.date}}<br> {{trans.time}}</td>
+                    <td >{{trans.date}}</td>
                     <td>{{trans.concept}}</td>
                     <th>{{trans.amount_parsed}}</th>
                     <td>{{trans.saldo}}</td>
@@ -83,8 +83,11 @@
             this.parsedTransactions = [...this.transactions].map(item=>{
                 let transaction = {...item.fields}
                 transaction.pk =item.pk
-                transaction.date = (new Date(transaction.occurred_in)).toLocaleDateString("es-MX")
-                transaction.time = (new Date(transaction.occurred_in)).toLocaleTimeString()
+                
+                const options = {  dateStyle:'full',timeStyle:'short'};
+                
+                transaction.date = new Intl.DateTimeFormat("es-MX",options).format(new Date(transaction.occurred_in))
+                //transaction.time = (new Date(transaction.occurred_in)).toLocaleTimeString()
                 transaction.amount_parsed = transaction.amount.toLocaleString('en-US',{style:'currency',currency: 'USD'})
                 const op_inversa= transaction.type_transaction==='add' ? 'Cargo': 'Abono'
                 transaction.obs = transaction.affected_account_id!=0 
