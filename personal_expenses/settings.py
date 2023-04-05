@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "django.contrib.humanize",
     "cuentas",
-    "login"
+    "login",
+    "rest",
+    'rest_framework'
 ]
 
 MIDDLEWARE = [

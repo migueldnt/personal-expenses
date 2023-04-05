@@ -17,7 +17,7 @@ from django.db.models import Sum
 def homeCapture(request):
     if request.user.is_authenticated:
         accounts = Account.objects.filter(
-            user=request.user, status="visible").order_by("order")
+            user=request.user, status="visible").order_by("order","-pk")
         accounts_json = serializers.serialize("json", accounts)
         active_account = request.GET["account-active"] if "account-active" in request.GET else 0
         return render(request=request, template_name="cuentas/home.html",
@@ -169,13 +169,13 @@ def transactionsByAccount(request, account_id):
     account_obj = get_object_or_404(Account, pk=account_id, user=request.user)
     queryset_trans = Transaction.objects.filter(
         account=account_obj).order_by("-occurred_in", "-pk")[:limit]
-    transactions = get_list_or_404(queryset_trans)
+    transactions = queryset_trans
     transactions_json = serializers.serialize("json", transactions)
 
     accounts = Account.objects.filter(user=request.user).order_by("order")
     accounts_json = serializers.serialize("json", accounts)
     return render(request=request, template_name="cuentas/transactions_by_account.html",
-                  context={"transactions": transactions_json, "account": account_obj, "all_accounts": accounts_json})
+                  context={"transactions": transactions_json, "account": account_obj, "all_accounts": accounts_json,"limit":limit})
 
 
 @login_required

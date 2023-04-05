@@ -21,9 +21,10 @@ import django.views.static
 from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls), #django-admin
     path("auth/",include("login.urls")),
     path("", include("cuentas.urls")),
+    path("api/v1/",include("rest.urls")),
 ]
 
 estaticos= [url(r'^static/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.STATIC_ROOT, 'show_indexes': settings.DEBUG})]

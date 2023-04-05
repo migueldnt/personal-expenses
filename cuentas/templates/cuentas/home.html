@@ -6,7 +6,7 @@
 {% verbatim %}
 <div class="container" id="app">
     <div class="columns">
-        <div class="column">
+        <div class="column is-one-third">
             <div class="panel is-primary">
                 <p class="panel-heading">Cuentas</p>
                 <!--
@@ -53,6 +53,15 @@
                 @saved_successfully="transaction_saved"
             />
 
+        </div>
+        <div class="column is-flex is-justify-content-center is-hidden-mobile" v-if="accounts.length===0">
+            <div class="mt-6">
+                Para empezar
+                <a href="{% url 'create_account' %}" class="button is-link is-outlined is-fullwidth">
+                    <span class="panel-icon"> <span class="material-icons">add</span> </span>
+                    Agrega una nueva cuenta
+                </a>
+            </div>
         </div>
         
     </div>

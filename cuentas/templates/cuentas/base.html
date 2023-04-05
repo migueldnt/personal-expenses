@@ -15,14 +15,20 @@
     <meta name="msapplication-config" content="/static/cuentas/icons/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
     
-    <style>.material-icons{
+    <style>
+    .material-icons{
         font-size: 1.2rem;
-    }</style>
+    }
+
+    table tr.first-of-day{
+        border-top: 2px solid black !important;
+    }
+    </style>
     
     {% block header %}
     {% endblock %}

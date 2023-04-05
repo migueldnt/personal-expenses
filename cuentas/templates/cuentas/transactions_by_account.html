@@ -7,7 +7,35 @@
     {% load humanize %}
     <h1 class="title is-4">{{account.name}} ${{account.balance|intcomma}}</h1>
     <h2 class="subtitle is-5">Transacciones</h2>
-    <a class="button is-info" href="/?account-active={{account.pk}}">Regresar</a>
+    <div class="columns">
+        <div class="column">
+            <a class="button is-info" href="/?account-active={{account.pk}}">Regresar</a>
+        </div>
+        <div class="column is-three-quarters">
+            <form method="GET" class="is-inline">
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal">
+                        <label class="label">Limite de registros:</label>
+                    </div>
+                    <div class="field-body">
+                        <div class="field">
+                            <p class="control">
+                                <input class="input" type="number" max="500" name="limit" value="{{limit}}" min="1" max="800">
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control">
+                                <input class="button" type="submit" value="Actualizar">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    
+    
     <hr>
     {% verbatim %}
     
@@ -18,7 +46,7 @@
     </div>
 
     <div class="table-container">
-        <table class="table is-striped is-fullwidth">
+        <table class="table is-fullwidth is-narrow">
             <thead>
                 <tr>
                     <th>#</th>
@@ -32,12 +60,16 @@
             </thead>
             <tbody>
                 <tr v-for="trans in transactions_filter" :key="trans.pk" 
-                :class="{'has-background-success-light':trans.type_transaction=='add','has-background-danger-light':trans.type_transaction=='subtract'}"
+                :class="{
+                    'has-background-success-light':trans.type_transaction==='add',
+                    'has-background-danger-light':trans.type_transaction=='subtract',
+                    'first-of-day': trans.firstOfDay,
+                }"
                 >
                     <td>{{trans.pk}}</td>
                     <td >{{trans.date}}</td>
                     <td>{{trans.concept}}</td>
-                    <th>{{trans.amount_parsed}}</th>
+                    <td>{{trans.amount_parsed}}</td>
                     <td>{{trans.saldo}}</td>
                     <td v-html="trans.obs"></td>
                     <td><a :href="'/edit-transaction/'+trans.pk+'/'">editar</a> | <a :href="'/delete-transaction/'+trans.pk+'/'">borrar</a></td>
@@ -79,14 +111,17 @@
         },
         created:function(){
             let posterior_saldo = saldo_final;
-            console.log("AQUI CREAR UN SERIALIZADOR PARA QUE LO DATOS LLEGUEN LO MAS ENTENDIBLES")
+            //console.log("AQUI CREAR UN SERIALIZADOR PARA QUE LO DATOS LLEGUEN LO MAS ENTENDIBLES")
+            let previusDay = ''
             this.parsedTransactions = [...this.transactions].map(item=>{
                 let transaction = {...item.fields}
                 transaction.pk =item.pk
                 
-                const options = {  dateStyle:'full',timeStyle:'short'};
+                const optionsStyleDate = {  dateStyle:'full',timeStyle:'short'};
+                const date = new Date(transaction.occurred_in)
+                transaction.date = new Intl.DateTimeFormat("es-MX",optionsStyleDate).format(date)
+                transaction.short_date = new Intl.DateTimeFormat("es-MX",{dateStyle:"short"}).format(date)
                 
-                transaction.date = new Intl.DateTimeFormat("es-MX",options).format(new Date(transaction.occurred_in))
                 //transaction.time = (new Date(transaction.occurred_in)).toLocaleTimeString()
                 transaction.amount_parsed = transaction.amount.toLocaleString('en-US',{style:'currency',currency: 'USD'})
                 const op_inversa= transaction.type_transaction==='add' ? 'Cargo': 'Abono'
@@ -95,8 +130,13 @@
                     : '..'
                 transaction.saldo = (posterior_saldo).toLocaleString('en-US',{style:'currency',currency: 'USD'});
                 posterior_saldo = posterior_saldo - transaction.amount;
+                transaction.firstOfDay = transaction.short_date !== previusDay
+                previusDay = transaction.short_date
                 return transaction
             })
+
+            
+            
         }
     });
 </script>
